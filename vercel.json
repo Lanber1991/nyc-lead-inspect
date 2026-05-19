@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/gmail-webhook",
+      "schedule": "0 13 * * *"
+    },
+    {
+      "path": "/api/gmail-webhook",
+      "schedule": "0 21 * * *"
+    }
+  ]
+}
