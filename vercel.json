@@ -1,4 +1,10 @@
 {
+  "functions": {
+    "pages/api/generate-work-plan.js": { "maxDuration": 60 },
+    "pages/api/generate-report.js":    { "maxDuration": 60 },
+    "pages/api/work-plan-pdf/[id].js": { "maxDuration": 60 },
+    "pages/api/report-pdf/[id].js":    { "maxDuration": 60 }
+  },
   "crons": [
     {
       "path": "/api/gmail-webhook",

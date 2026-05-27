@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -94,7 +94,7 @@
 <body>
 <div class="app">
   <div class="app-header">
-    <div class="app-title">IAQ / Lead Paint Inspection</div>
+    <div class="app-title">Lead Paint Inspection</div>
     <div class="app-sub">NYC Lead Inspections — Field Inspection Form</div>
     <div class="progress-bar"><div class="progress-fill" id="progress" style="width:14%"></div></div>
   </div>
@@ -102,6 +102,11 @@
 
   <!-- SECTION 1: Site Info -->
   <div class="section active" id="sec0">
+    <div style="display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap">
+      <button type="button" class="type-btn" data-type="iaq" onclick="setInspectionType('iaq')" style="padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;border:1.5px solid #0E2A50;background:#0E2A50;color:white;cursor:pointer;transition:all 0.15s">Lead Paint Inspection</button>
+      <button type="button" class="type-btn" data-type="pre-rem" onclick="setInspectionType('pre-rem')" style="padding:9px 16px;border-radius:8px;font-size:13px;font-weight:400;border:1.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-secondary);cursor:pointer;transition:all 0.15s">Pre-Remediation Assessment</button>
+      <button type="button" class="type-btn" data-type="post-rem" onclick="setInspectionType('post-rem')" style="padding:9px 16px;border-radius:8px;font-size:13px;font-weight:400;border:1.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-secondary);cursor:pointer;transition:all 0.15s">Post-Remediation Clearance</button>
+    </div>
     <div class="section-title">Site Information & Inspector Details</div>
     <div class="field-row" style="grid-template-columns:1fr 1fr 1fr">
       <div class="field-group"><label>Inspection Date</label><input type="date" id="inspDate"></div>
@@ -218,6 +223,24 @@
         <label class="radio-option"><input type="radio" name="purpose" value="Visual Only" onchange="onPurposeChange()"><span>Visual Only</span></label>
       </div>
     </div>
+    <!-- HPD Violation Details — shown for pre-rem and post-rem types -->
+    <div id="hpdFields" style="display:none" class="reading-card">
+      <div class="reading-card-title" style="color:#1E40AF">HPD Violation Details</div>
+      <div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:0.75rem">
+        <div style="flex:1" class="field-group">
+          <label>HPD Violation Number</label>
+          <input type="text" id="hpdViolationNum" placeholder="e.g. 13078521" style="font-family:monospace;letter-spacing:0.5px">
+        </div>
+        <button type="button" id="hpdLookupBtn" onclick="lookupHPDViolation()" style="padding:9px 16px;background:#1E40AF;color:white;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;margin-bottom:1.25rem;flex-shrink:0">Look Up ↗</button>
+      </div>
+      <div id="hpdLookupStatus" style="font-size:12px;color:var(--color-text-secondary);margin-bottom:0.75rem"></div>
+      <div class="field-row">
+        <div class="field-group"><label>Affected Unit(s)</label><input type="text" id="hpdAffectedUnits" placeholder="e.g. Apt 3B, 4A"></div>
+        <div class="field-group"><label>Responsible Party / Owner</label><input type="text" id="hpdOwner" placeholder="Auto-filled from lookup"></div>
+      </div>
+      <div class="field-group"><label>Violation Description</label><textarea id="hpdViolationDesc" rows="2" placeholder="Auto-filled from lookup, or describe the violation…"></textarea></div>
+    </div>
+
     <div class="reading-card">
       <div class="reading-card-title">Weather Conditions</div>
       <div class="field-row">
@@ -419,17 +442,17 @@
         <div class="field-group"><label>HVAC serving affected area?</label>
           <select id="hvacServingArea"><option value="">Select...</option><option>Yes — directly serves affected area</option><option>Partially — shared system</option><option>No — separate system</option><option>Unknown</option></select>
         </div>
-        <div class="field-group"><label>Mold visible on supply/return vents?</label>
-          <select id="moldOnVents"><option value="">Select...</option><option>No mold visible</option><option>Yes — supply vents</option><option>Yes — return vents</option><option>Yes — both</option><option>Not accessible</option></select>
+        <div class="field-group"><label>Lead paint visible near HVAC vents?</label>
+          <select id="moldOnVents"><option value="">Select...</option><option>No lead paint hazards visible</option><option>Yes — near supply vents</option><option>Yes — return vents</option><option>Yes — both</option><option>Not accessible</option></select>
         </div>
       </div>
     </div>
     <div class="reading-card">
       <div class="reading-card-title">Conditions Observed</div>
       <div class="obs-grid">
-        <label class="obs-check"><input type="checkbox" class="hvac-obs" value="Visible mold in AHU"><span>Mold in AHU</span></label>
-        <label class="obs-check"><input type="checkbox" class="hvac-obs" value="Mold on coils"><span>Mold on coils</span></label>
-        <label class="obs-check"><input type="checkbox" class="hvac-obs" value="Mold on ductwork"><span>Mold on ducts</span></label>
+        <label class="obs-check"><input type="checkbox" class="hvac-obs" value="Deteriorated paint near AHU"><span>Paint near AHU</span></label>
+        <label class="obs-check"><input type="checkbox" class="hvac-obs" value="Paint deterioration near coils"><span>Paint deterioration near coils</span></label>
+        <label class="obs-check"><input type="checkbox" class="hvac-obs" value="Deteriorated paint on ductwork"><span>Paint on ducts</span></label>
         <label class="obs-check"><input type="checkbox" class="hvac-obs" value="Standing water in unit"><span>Standing water</span></label>
         <label class="obs-check"><input type="checkbox" class="hvac-obs" value="Condensation issues"><span>Condensation</span></label>
         <label class="obs-check"><input type="checkbox" class="hvac-obs" value="Dirty drip pan"><span>Dirty drip pan</span></label>
@@ -484,8 +507,106 @@
     <div id="summaryWidget_recommendations"></div>
   </div>
 
-  <!-- SECTION 7: Submit / Review & Generate -->
+  <!-- SECTION 9: Pre-Remediation Assessment Visual Inspection -->
+  <div class="section" id="sec8">
+    <div class="section-title">Visual Inspection</div>
+
+    <!-- Violation summary card -->
+    <div id="preRemViolationCard" class="reading-card" style="border:1.5px solid #93C5FD;background:#EFF6FF;display:none;margin-bottom:1.25rem">
+      <div class="reading-card-title" style="color:#1E40AF">HPD Violation</div>
+      <div id="preRemViolationText" style="font-size:13px;color:#1E3A5F;line-height:1.6;margin-bottom:1rem"></div>
+      <button type="button" id="buildChecklistBtn" onclick="generateAssessmentChecklist()" style="padding:8px 18px;background:#0E2A50;color:white;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer">✦ Build Checklist</button>
+      <span id="checklistStatus" style="font-size:12px;color:var(--color-text-secondary);margin-left:10px"></span>
+    </div>
+
+    <!-- If no violation description yet -->
+    <div id="preRemNoViolation" style="font-size:13px;color:var(--color-text-secondary);padding:12px 0;margin-bottom:1rem">
+      Go back to Site Info, enter an HPD Violation Number and click <strong>Look Up</strong> — the violation description will appear here and you can generate a tailored checklist.
+    </div>
+
+    <!-- Checklist -->
+    <div id="preRemChecklist"></div>
+
+    <!-- Moisture readings -->
+    <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:0.5px solid var(--color-border-tertiary)">
+      <div style="font-size:13px;font-weight:500;margin-bottom:0.75rem">Moisture Readings</div>
+      <div id="moistureReadingsList"></div>
+      <button class="add-btn" onclick="addMoistureReading()">+ Add Reading</button>
+    </div>
+
+    <!-- Photos -->
+    <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:0.5px solid var(--color-border-tertiary)">
+      <div style="font-size:12px;font-weight:600;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:10px">📷 Photos (Thermal & Visual)</div>
+      <div id="preRemPhotoLog"></div>
+      <button class="add-btn" onclick="addPhotoEntry('preRemPhotoLog','preRemPhoto')">+ Add Photo</button>
+    </div>
+
+    <!-- General notes -->
+    <div class="field-group" style="margin-top:1.5rem">
+      <label>Assessment Notes</label>
+      <textarea id="preRemNotes" rows="4" placeholder="Overall conditions observed, access limitations, recommendations for remediation scope…"></textarea>
+      <button class="refine-btn" onclick="refineNotes('preRemNotes', 'Pre-remediation assessment visual inspection notes — conditions observed, HPD violation context, recommended remediation scope', this)">✦ Refine with Claude</button>
+      <button class="mic-btn" onclick="voiceInput('preRemNotes', this)">🎤 Dictate</button>
+    </div>
+    <div class="field-group"><label>Inspector Signature (typed)</label><input type="text" id="preRemSignature" placeholder="Type full name to sign"></div>
+  </div>
+
+  <!-- SECTION 7: Post-Remediation Clearance -->
   <div class="section" id="sec6">
+    <div class="section-title">Post-Remediation Clearance</div>
+    <div class="field-group">
+      <label>Clearance Result</label>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">
+        <button type="button" id="clearPass" onclick="selectClearance('pass')"
+          style="padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;border:2px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-secondary);cursor:pointer;transition:all 0.15s">✓ Pass — Clearance Granted</button>
+        <button type="button" id="clearFail" onclick="selectClearance('fail')"
+          style="padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;border:2px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-secondary);cursor:pointer;transition:all 0.15s">✗ Fail — Re-Remediation Required</button>
+      </div>
+      <input type="hidden" id="clearanceResult" value="">
+    </div>
+    <div class="field-row" style="margin-top:1.25rem">
+      <div class="field-group"><label>Remediation Contractor</label><input type="text" id="remContractor" placeholder="Company or individual who performed the work"></div>
+      <div class="field-group"><label>Work Completion Date</label><input type="date" id="workCompleteDate"></div>
+    </div>
+    <div class="field-group">
+      <label>Scope of Work Performed</label>
+      <textarea id="workScope" rows="3" placeholder="Describe what was remediated, materials removed, repairs made…"></textarea>
+      <button class="refine-btn" onclick="refineNotes('workScope', 'Post-remediation scope of work performed by contractor', this)">✦ Refine with Claude</button>
+      <button class="mic-btn" onclick="voiceInput('workScope', this)">🎤 Dictate</button>
+    </div>
+    <div class="reading-card">
+      <div class="reading-card-title">Clearance Visual Observations</div>
+      <div class="field-group">
+        <label>Clearance Inspection Notes</label>
+        <textarea id="clearanceNotes" rows="4" placeholder="Conditions observed during clearance — visible mold, moisture, substrate condition, effectiveness of remediation…"></textarea>
+        <button class="refine-btn" onclick="refineNotes('clearanceNotes', 'Post-remediation clearance visual inspection observations', this)">✦ Refine with Claude</button>
+        <button class="mic-btn" onclick="voiceInput('clearanceNotes', this)">🎤 Dictate</button>
+      </div>
+      <div class="field-group">
+        <label>Deficiencies Found</label>
+        <div class="obs-grid">
+          <label class="obs-check"><input type="checkbox" class="clear-deficiency" value="Visible mold remaining"><span>Visible mold remaining</span></label>
+          <label class="obs-check"><input type="checkbox" class="clear-deficiency" value="Active moisture present"><span>Active moisture</span></label>
+          <label class="obs-check"><input type="checkbox" class="clear-deficiency" value="Incomplete material removal"><span>Incomplete removal</span></label>
+          <label class="obs-check"><input type="checkbox" class="clear-deficiency" value="Inadequate containment removal"><span>Containment not removed</span></label>
+          <label class="obs-check"><input type="checkbox" class="clear-deficiency" value="Structural damage not addressed"><span>Structural not addressed</span></label>
+          <label class="obs-check"><input type="checkbox" class="clear-deficiency" value="None — work acceptable"><span>None — acceptable</span></label>
+        </div>
+      </div>
+      <div id="clearancePhotoLog"></div>
+      <button class="add-btn" onclick="addPhotoEntry('clearancePhotoLog','clearPhoto')">+ Add Photo</button>
+    </div>
+    <div class="field-group">
+      <label>Clearance Conclusions</label>
+      <textarea id="clearanceConclusions" rows="4" placeholder="Professional conclusions regarding the remediation work…"></textarea>
+      <button class="refine-btn" onclick="refineNotes('clearanceConclusions', 'Post-remediation clearance inspection conclusions', this)">✦ Refine with Claude</button>
+      <button class="mic-btn" onclick="voiceInput('clearanceConclusions', this)">🎤 Dictate</button>
+    </div>
+    <div class="field-group"><label>Inspector Signature (typed)</label><input type="text" id="clearSignature" placeholder="Type full name to sign"></div>
+  </div>
+
+  <!-- SECTION 8: Submit / Review & Generate -->
+  <div class="section" id="sec7">
     <div class="section-title">Review & Submit</div>
     <div id="summaryContent"></div>
 
@@ -526,7 +647,7 @@ const COMPANY_FOOTER = 'NYC Lead Inspections  \u2013  208 Meserole Street Brookl
 const INSPECTORS = {
   'Owen-Roe Kavanagh': {
     cert: '25-6HAIS-SHMO',
-    role: 'Mold Assessor — NYS DOL',
+    role: 'Lead Inspector — NYS DOL',
     expires: '09/27',
     phone: '(646) 496-7039',
     email: 'info@nycleadinspections.com',
@@ -535,7 +656,7 @@ const INSPECTORS = {
   },
   'Ian Bradley': {
     cert: '26-67411-SHMO',
-    role: 'Mold Assessor & Abatement Supervisor — NYS DOL',
+    role: 'Lead Inspector & Abatement Supervisor — NYS DOL',
     expires: '01/28',
     phone: '(646) 496-7039',
     email: 'ian@mindfulsolutionsny.com',
@@ -544,8 +665,139 @@ const INSPECTORS = {
   }
 };
 
-const steps = ['Site Info','Visual Insp.','Affected Areas','Samples','HVAC','Recommendations','Review'];
+const steps = ['Site Info','Visual Insp.','Affected Areas','Samples','HVAC','Recommendations','Clearance','Review'];
 let currentStep = 0;
+let inspectionType = 'iaq';
+
+function setInspectionType(type) {
+  inspectionType = type;
+  document.querySelectorAll('.type-btn').forEach(b => {
+    const active = b.dataset.type === type;
+    b.style.background = active ? '#0E2A50' : 'var(--color-background-secondary)';
+    b.style.color = active ? 'white' : 'var(--color-text-secondary)';
+    b.style.borderColor = active ? '#0E2A50' : 'var(--color-border-secondary)';
+    b.style.fontWeight = active ? '600' : '400';
+  });
+  const isHPD = type !== 'iaq';
+  document.getElementById('hpdFields').style.display = isHPD ? '' : 'none';
+  const titles = { 'iaq': 'Lead Paint Inspection', 'pre-rem': 'Pre-Remediation Assessment', 'post-rem': 'Post-Remediation Clearance' };
+  document.querySelector('.app-title').textContent = titles[type];
+  document.getElementById(`sec${currentStep}`).classList.remove('active');
+  currentStep = 0;
+  document.getElementById('sec0').classList.add('active');
+  initStepNav();
+  updateNav();
+  window.scrollTo(0, 0);
+}
+
+let moistureReadingCount = 0;
+function addMoistureReading() {
+  moistureReadingCount++;
+  const id = moistureReadingCount;
+  const div = document.createElement('div');
+  div.id = `mr${id}`;
+  div.style.cssText = 'display:grid;grid-template-columns:1fr 90px 130px auto;gap:8px;align-items:center;margin-bottom:8px';
+  div.innerHTML = `
+    <input type="text" placeholder="Location (e.g. NE wall, ceiling)" style="padding:8px 10px;border:0.5px solid var(--color-border-secondary);border-radius:8px;font-size:13px;font-family:inherit;color:var(--color-text-primary);background:var(--color-background-primary)">
+    <input type="number" placeholder="%" min="0" max="100" style="padding:8px 10px;border:0.5px solid var(--color-border-secondary);border-radius:8px;font-size:13px;font-family:inherit;color:var(--color-text-primary);background:var(--color-background-primary)">
+    <select style="padding:8px 10px;border:0.5px solid var(--color-border-secondary);border-radius:8px;font-size:13px;font-family:inherit;color:var(--color-text-primary);background:var(--color-background-primary)">
+      <option value="">Substrate…</option>
+      <option>Drywall</option><option>Wood</option><option>Concrete</option><option>Brick</option><option>Tile/Grout</option><option>Insulation</option><option>Other</option>
+    </select>
+    <button onclick="document.getElementById('mr${id}').remove()" style="padding:6px 10px;border:none;background:none;color:var(--color-text-danger);cursor:pointer;font-size:13px;border-radius:6px;border:0.5px solid var(--color-border-secondary)">✕</button>`;
+  document.getElementById('moistureReadingsList').appendChild(div);
+}
+
+async function generateAssessmentChecklist() {
+  const violationDesc = document.getElementById('hpdViolationDesc')?.value?.trim();
+  if (!violationDesc) { alert('No violation description found. Please look up the HPD violation first.'); return; }
+  const btn = document.getElementById('buildChecklistBtn');
+  const status = document.getElementById('checklistStatus');
+  btn.disabled = true; btn.textContent = '✦ Building…';
+  status.textContent = '';
+  try {
+    const resp = await fetch(`${DASHBOARD_URL}/api/generate-assessment-checklist`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ violationDesc, propertyAddress: document.getElementById('propAddr')?.value || '' })
+    });
+    if (!resp.ok) throw new Error('API error');
+    const { items } = await resp.json();
+    renderAssessmentChecklist(items);
+    status.textContent = `${items.length} items generated`;
+    status.style.color = '#1D9E75';
+  } catch(e) {
+    status.textContent = 'Failed — try again';
+    status.style.color = '#E24B4A';
+  } finally {
+    btn.disabled = false; btn.textContent = '✦ Build Checklist';
+  }
+}
+
+function renderAssessmentChecklist(items) {
+  const container = document.getElementById('preRemChecklist');
+  container.innerHTML = items.map((item, i) => `
+    <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:0.5px solid var(--color-border-tertiary)">
+      <input type="checkbox" id="chk${i}" style="width:auto;margin-top:3px;flex-shrink:0;cursor:pointer">
+      <div style="flex:1">
+        <label for="chk${i}" style="font-size:13px;font-weight:500;color:var(--color-text-primary);cursor:pointer;text-transform:none;letter-spacing:0;margin-bottom:4px;display:block">${item.description}</label>
+        ${item.needsMoisture ? `
+        <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+          <span style="font-size:11px;color:var(--color-text-secondary);white-space:nowrap">Moisture %</span>
+          <input type="number" min="0" max="100" placeholder="—" style="width:70px;padding:5px 8px;border:0.5px solid var(--color-border-secondary);border-radius:6px;font-size:13px;font-family:inherit;color:var(--color-text-primary);background:var(--color-background-primary)">
+          <span style="font-size:11px;padding:2px 8px;border-radius:20px;background:#DBEAFE;color:#1E40AF">${item.category}</span>
+        </div>` : `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:#F1F5F9;color:#475569;margin-top:4px;display:inline-block">${item.category}</span>`}
+      </div>
+    </div>`).join('');
+}
+
+function syncPreRemViolationCard() {
+  const desc = document.getElementById('hpdViolationDesc')?.value?.trim();
+  const card = document.getElementById('preRemViolationCard');
+  const noViolation = document.getElementById('preRemNoViolation');
+  if (desc) {
+    document.getElementById('preRemViolationText').textContent = desc;
+    card.style.display = '';
+    noViolation.style.display = 'none';
+  } else {
+    card.style.display = 'none';
+    noViolation.style.display = '';
+  }
+}
+
+async function lookupHPDViolation() {
+  const vnum = (document.getElementById('hpdViolationNum').value || '').trim();
+  if (!vnum) return;
+  const btn = document.getElementById('hpdLookupBtn');
+  const status = document.getElementById('hpdLookupStatus');
+  btn.textContent = 'Looking up…'; btn.disabled = true;
+  status.textContent = ''; status.style.color = 'var(--color-text-secondary)';
+  try {
+    const resp = await fetch(`https://data.cityofnewyork.us/resource/wvxf-dwi5.json?violationid=${encodeURIComponent(vnum)}&$limit=1`);
+    if (!resp.ok) throw new Error('API error');
+    const rows = await resp.json();
+    if (!rows.length) {
+      status.textContent = '⚠ Violation not found. Check the number or fill in manually.';
+      status.style.color = '#D97706';
+    } else {
+      const v = rows[0];
+      if (v.ownername) document.getElementById('hpdOwner').value = v.ownername;
+      if (v.apartment) document.getElementById('hpdAffectedUnits').value = v.apartment;
+      if (v.novdescription) document.getElementById('hpdViolationDesc').value = v.novdescription;
+      const addr = [v.housenumber, v.streetname].filter(Boolean).join(' ');
+      const addrField = document.getElementById('propAddr');
+      if (addr && addrField && !addrField.value) addrField.value = addr;
+      syncPreRemViolationCard();
+      status.textContent = '✓ Found — ' + (v.currentstatus || 'Active');
+      status.style.color = '#1D9E75';
+    }
+  } catch(e) {
+    status.textContent = '⚠ Lookup failed. Please fill in manually.';
+    status.style.color = '#E24B4A';
+  } finally {
+    btn.textContent = 'Look Up ↗'; btn.disabled = false;
+  }
+}
 let moldCount = 0, moistCount = 0, airCount = 0, photoCount = 0, recCount = 0;
 
 function onInspectorSelect(val) {
@@ -599,20 +851,54 @@ async function loadLogo() {
   });
 }
 
+function getTypeNavConfig() {
+  if (inspectionType === 'pre-rem') {
+    return [
+      { sec: 0, label: 'Site Info' },
+      { sec: 8, label: 'Visual Inspection' },
+      { sec: 7, label: 'Review' },
+    ];
+  }
+  if (inspectionType === 'post-rem') {
+    return [
+      { sec: 0, label: 'Site Info' },
+      { sec: 1, label: 'Visual Insp.' },
+      { sec: 6, label: 'Clearance' },
+      { sec: 7, label: 'Review' },
+    ];
+  }
+  const config = [
+    { sec: 0, label: 'Site Info' },
+    { sec: 1, label: 'Visual Insp.' },
+    { sec: 2, label: 'Affected Areas' },
+  ];
+  if (getRadio('purpose') !== 'Visual Only') config.push({ sec: 3, label: 'Samples' });
+  config.push({ sec: 4, label: 'HVAC' }, { sec: 5, label: 'Recommendations' }, { sec: 7, label: 'Review' });
+  return config;
+}
+
 function initStepNav() {
-  document.getElementById('stepNav').innerHTML = steps.map((s,i) =>
-    `<div class="step-dot ${i===0?'active':''}" id="dot${i}" onclick="goTo(${i})">${s}</div>`).join('');
+  const config = getTypeNavConfig();
+  document.getElementById('stepNav').innerHTML = config.map(item => {
+    const isCurrent = item.sec === currentStep;
+    const myIdx = config.findIndex(c => c.sec === item.sec);
+    const curIdx = config.findIndex(c => c.sec === currentStep);
+    const cls = isCurrent ? 'active' : (myIdx < curIdx ? 'done' : '');
+    return `<div class="step-dot ${cls}" id="dot${item.sec}" onclick="goTo(${item.sec})">${item.label}</div>`;
+  }).join('');
 }
 
 function goTo(n) {
   document.getElementById(`sec${currentStep}`).classList.remove('active');
-  document.getElementById(`dot${currentStep}`).classList.replace('active','done');
+  const prevDot = document.getElementById(`dot${currentStep}`);
+  if (prevDot) prevDot.classList.replace('active','done');
   currentStep = n;
   document.getElementById(`sec${currentStep}`).classList.add('active');
   const dot = document.getElementById(`dot${currentStep}`);
-  dot.classList.remove('done'); dot.classList.add('active');
+  if (dot) { dot.classList.remove('done'); dot.classList.add('active'); }
   updateNav();
-  if (currentStep === 6) buildSummary();
+  if (currentStep === 7) buildSummary();
+  if (currentStep === 8) syncPreRemViolationCard();
   window.scrollTo(0,0);
 }
 
@@ -625,28 +911,30 @@ function onPurposeChange() {
   const isVisual = getRadio('purpose') === 'Visual Only';
   document.getElementById('visualOnlyBanner').style.display = isVisual ? '' : 'none';
   document.getElementById('sampleContent').style.display = isVisual ? 'none' : '';
-  const dot = document.getElementById('dot3');
-  if (dot) dot.title = isVisual ? 'Skipped — Visual Only inspection' : '';
-
-  // COC is optional — hide the card for Visual Only since no samples collected
   const cocCard = document.getElementById('cocCard');
   if (cocCard) cocCard.style.display = isVisual ? 'none' : '';
+  if (inspectionType === 'iaq') initStepNav();
 }
 
 function navigate(dir) {
-  let n = currentStep + dir;
-  // Skip the Samples step (index 3) when Visual Only is selected
-  if (getRadio('purpose') === 'Visual Only' && n === 3) n += dir;
-  if (n >= 0 && n < steps.length) goTo(n);
+  const config = getTypeNavConfig();
+  const idx = config.findIndex(c => c.sec === currentStep);
+  const nextIdx = idx + dir;
+  if (nextIdx >= 0 && nextIdx < config.length) goTo(config[nextIdx].sec);
 }
 
 function updateNav() {
-  const p = ((currentStep+1)/steps.length*100).toFixed(0);
-  document.getElementById('progress').style.width = p+'%';
-  document.getElementById('btnBack').style.display = currentStep > 0 ? '' : 'none';
+  const config = getTypeNavConfig();
+  const idx = config.findIndex(c => c.sec === currentStep);
+  const p = ((idx + 1) / config.length * 100).toFixed(0);
+  document.getElementById('progress').style.width = p + '%';
+  document.getElementById('btnBack').style.display = idx > 0 ? '' : 'none';
   const nxt = document.getElementById('btnNext');
-  if (currentStep === 6) { nxt.style.display='none'; }
-  else { nxt.style.display=''; nxt.textContent = currentStep===5 ? 'Review' : 'Next'; }
+  if (idx === config.length - 1) { nxt.style.display = 'none'; }
+  else {
+    nxt.style.display = '';
+    nxt.textContent = config[idx + 1]?.sec === 7 ? 'Review' : 'Next';
+  }
 }
 
 let areaCount = 0;
@@ -750,6 +1038,19 @@ function selSev(el, id, v) {
   el.classList.add('selected');
   const hidden = document.getElementById(`mSevVala${id}`);
   if (hidden) hidden.value = v;
+}
+
+function selectClearance(result) {
+  const pass = document.getElementById('clearPass');
+  const fail = document.getElementById('clearFail');
+  if (result === 'pass') {
+    pass.style.background = '#D1FAE5'; pass.style.color = '#065F46'; pass.style.borderColor = '#6EE7B7';
+    fail.style.background = 'var(--color-background-secondary)'; fail.style.color = 'var(--color-text-secondary)'; fail.style.borderColor = 'var(--color-border-secondary)';
+  } else {
+    fail.style.background = '#FEE2E2'; fail.style.color = '#991B1B'; fail.style.borderColor = '#FCA5A5';
+    pass.style.background = 'var(--color-background-secondary)'; pass.style.color = 'var(--color-text-secondary)'; pass.style.borderColor = 'var(--color-border-secondary)';
+  }
+  document.getElementById('clearanceResult').value = result;
 }
 
 function selectRisk(el, v) {
@@ -934,7 +1235,7 @@ function addRecommendation() {
         <select id="recPri${id}"><option value="">Select...</option><option>Immediate (24-48 hrs)</option><option>Urgent (within 1 week)</option><option>Routine (within 30 days)</option><option>Long-term / Preventive</option></select>
       </div>
       <div class="field-group"><label>Category</label>
-        <select id="recCat${id}"><option value="">Select...</option><option>Lead Abatement</option><option>Water Intrusion Repair</option><option>HVAC Repair/Cleaning</option><option>Moisture Control</option><option>Further Testing</option><option>Ventilation Improvement</option><option>Structural Repair</option></select>
+        <select id="recCat${id}"><option value="">Select...</option><option>Mold Remediation</option><option>Water Intrusion Repair</option><option>HVAC Repair/Cleaning</option><option>Moisture Control</option><option>Further Testing</option><option>Ventilation Improvement</option><option>Structural Repair</option></select>
       </div>
     </div>
     <div class="field-group"><label>Recommendation</label><textarea id="recText${id}" placeholder="Specific action to be taken..."></textarea>
@@ -992,7 +1293,7 @@ async function generateReport(narratives) {
     if(logoUrl){try{doc.addImage(logoUrl,'PNG',W-margin-54,3,54,54);}catch(e){}}
     doc.setTextColor(255,255,255);
     doc.setFontSize(14);doc.setFont('helvetica','bold');doc.text('MINDFUL SOLUTIONS NY',margin,24);
-    doc.setFontSize(9);doc.setFont('helvetica','normal');doc.text('Residential Building Services  |  IAQ / Lead Paint Inspection Report',margin,38);
+    doc.setFontSize(9);doc.setFont('helvetica','normal');doc.text('Residential Building Services  |  Lead Paint Inspection Report',margin,38);
     doc.setFontSize(8);doc.text(`Report #: ${val('reportNum')}  |  Inspector: ${val('inspName')}  |  Date: ${val('inspDate')} ${val('inspTime')}`,margin,52);
     doc.setDrawColor(180,180,180);doc.line(margin,footerY-10,W-margin,footerY-10);
     doc.setTextColor(100,100,100);doc.setFontSize(7);doc.setFont('helvetica','normal');
@@ -2287,8 +2588,10 @@ async function doSubmit(dashUrl) {
     client_name: val('clientName'),
     inspection_date: val('inspDate'),
     purpose: getRadio('purpose'),
+    inspection_type: inspectionType,
     form_data: {
       ...fd,
+      inspection_type: inspectionType,
       reportNum: val('reportNum'), inspName: val('inspName'), inspCert: val('inspCert'),
       inspPhone: val('inspPhone'), inspEmail: val('inspEmail'), company: val('company'),
       propAddr: val('propAddr'), propUnit: val('propUnit'), propCity: val('propCity'),
@@ -2304,6 +2607,23 @@ async function doSubmit(dashUrl) {
       ductCond: val('ductCond'), hvacNotes: val('hvacNotes'),
       flowRate: val('flowRate'), labName: val('labName'), cocNum: val('cocNum'),
       cocNumber: val('cocNumber'),
+      hpdViolationNum: val('hpdViolationNum'), hpdAffectedUnits: val('hpdAffectedUnits'),
+      hpdOwner: val('hpdOwner'), hpdViolationDesc: val('hpdViolationDesc'),
+      clearanceResult: val('clearanceResult'), remContractor: val('remContractor'),
+      workCompleteDate: val('workCompleteDate'), workScope: val('workScope'),
+      clearanceNotes: val('clearanceNotes'), clearanceConclusions: val('clearanceConclusions'),
+      clearSignature: val('clearSignature'),
+      clearDeficiencies: [...document.querySelectorAll('.clear-deficiency:checked')].map(e => e.value),
+      preRemNotes: val('preRemNotes'), preRemSignature: val('preRemSignature'),
+      preRemChecklist: [...document.querySelectorAll('#preRemChecklist > div')].map((row, i) => ({
+        description: row.querySelector('label')?.textContent || '',
+        checked: row.querySelector('input[type=checkbox]')?.checked || false,
+        moisture: row.querySelector('input[type=number]')?.value || '',
+      })),
+      moistureReadings: [...document.querySelectorAll('#moistureReadingsList > div')].map(row => {
+        const inputs = row.querySelectorAll('input, select');
+        return { location: inputs[0]?.value || '', reading: inputs[1]?.value || '', substrate: inputs[2]?.value || '' };
+      }),
     }
   };
   try {

@@ -23,6 +23,8 @@ export default function InspectionDetail() {
   const [workPlanStatus, setWorkPlanStatus] = useState('')
   const [reviewing, setReviewing] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
+  const [areaScope, setAreaScope] = useState([])
+  const [scopeSaving, setScopeSaving] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -39,13 +41,42 @@ export default function InspectionDetail() {
       const data = await res.json()
       setInsp(data)
       if (data.lab_data) setLabResults(data.lab_data)
+      const areas = data.form_data?.affectedAreas || []
+      if (data.form_data?.areaActions?.length > 0) {
+        setAreaScope(data.form_data.areaActions)
+      } else {
+        setAreaScope(areas.map(() => 'Investigate / Monitor'))
+      }
     }
     setLoading(false)
   }
 
+  async function saveAreaScope() {
+    setScopeSaving(true)
+    try {
+      const updatedFd = { ...(insp.form_data || {}), areaActions: areaScope }
+      const res = await fetch('/api/inspections', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, form_data: updatedFd })
+      })
+      if (res.ok) {
+        showMsg('Work plan scope saved')
+        await fetchInspection()
+      } else {
+        const errBody = await res.text().catch(() => '')
+        showMsg(`Save failed (${res.status})${errBody ? ': ' + errBody.slice(0, 120) : ''}`, 'error')
+      }
+    } catch (e) {
+      showMsg(`Save failed: ${e.message}`, 'error')
+    } finally {
+      setScopeSaving(false)
+    }
+  }
+
   function showMsg(text, type='success') {
     setMsg(text); setMsgType(type)
-    setTimeout(() => setMsg(''), 4000)
+    if (type !== 'error') setTimeout(() => setMsg(''), 4000)
   }
 
   async function markWorkPlanReviewed() {
@@ -187,14 +218,16 @@ export default function InspectionDetail() {
 
   const hasLab = !!insp.lab_data
   const hasReport = !!insp.report_html
+  const scopeSet = !!(fd.areaActions?.length > 0)
   const hasWorkPlan = !!(insp.work_plan_data?.contentHtml || insp.work_plan_data?.html)
   const wpReviewed = !!insp.work_plan_data?.reviewed
   const isComplete = insp.status === 'complete'
   const visualOnly = !!(fd.visual_only)
 
   const pipelineStages = [
-    ...(visualOnly ? [] : [{ key:'lab', label:'Lab Results', done: hasLab }]),
+    ...(visualOnly ? [] : [{ key:'lab',      label:'Lab Results',    done: hasLab }]),
     { key:'report',   label:'Report',         done: hasReport },
+    { key:'scope',    label:'Flag Areas',     done: scopeSet },
     { key:'workplan', label:'Work Plan',       done: hasWorkPlan },
     { key:'reviewed', label:'Reviewed & Sent', done: wpReviewed },
     { key:'complete', label:'Complete',        done: isComplete },
@@ -255,6 +288,9 @@ export default function InspectionDetail() {
                 {updating ? 'Generating…' : '✦ Generate & Email Report'}
               </button>
             )}
+            {activeKey === 'scope' && (
+              <span style={{fontSize:'12px',color:'#64748B'}}>Flag each area below, then save</span>
+            )}
             {activeKey === 'workplan' && (
               <button onClick={generateWorkPlan} disabled={workPlanStatus==='generating'} style={{background:'#0E2A50',color:'white',border:'none',borderRadius:'8px',padding:'9px 16px',fontSize:'13px',fontWeight:'500',cursor:workPlanStatus==='generating'?'not-allowed':'pointer',opacity:workPlanStatus==='generating'?0.7:1,whiteSpace:'nowrap'}}>
                 {workPlanStatus === 'generating' ? 'Generating…' : '⊞ Generate Work Plan'}
@@ -287,7 +323,12 @@ export default function InspectionDetail() {
         </div>
 
         <div style={{maxWidth:'800px',margin:'0 auto',padding:'24px 16px'}}>
-          {msg && <div style={{background:msgType==='error'?'#FEE2E2':'#D1FAE5',color:msgType==='error'?'#991B1B':'#065F46',border:`1px solid ${msgType==='error'?'#FCA5A5':'#6EE7B7'}`,borderRadius:'8px',padding:'10px 16px',marginBottom:'16px',fontSize:'13px'}}>{msg}</div>}
+          {msg && (
+            <div style={{background:msgType==='error'?'#FEE2E2':'#D1FAE5',color:msgType==='error'?'#991B1B':'#065F46',border:`1px solid ${msgType==='error'?'#FCA5A5':'#6EE7B7'}`,borderRadius:'8px',padding:'10px 16px',marginBottom:'16px',fontSize:'13px',display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:'12px'}}>
+              <span>{msg}</span>
+              {msgType === 'error' && <button onClick={()=>setMsg('')} style={{background:'none',border:'none',cursor:'pointer',color:'#991B1B',fontSize:'16px',lineHeight:1,padding:0,flexShrink:0}}>✕</button>}
+            </div>
+          )}
 
           {/* Property */}
           <div style={{background:'white',borderRadius:'12px',border:'1px solid #E2E8F0',padding:'20px 24px',marginBottom:'16px'}}>
@@ -369,6 +410,63 @@ export default function InspectionDetail() {
             )}
           </div>
 
+          {/* Flag Areas — Work Plan Scope */}
+          {hasReport && (fd.affectedAreas?.length > 0) && (
+            <div style={{background:'white',borderRadius:'12px',border:`1px solid ${scopeSet?'#86EFAC':'#E2E8F0'}`,padding:'20px 24px',marginBottom:'16px'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'4px'}}>
+                <div style={{fontSize:'14px',fontWeight:'600',color:'#0F172A'}}>Work Plan Scope</div>
+                {scopeSet && <span style={{background:'#D1FAE5',color:'#065F46',border:'1px solid #6EE7B7',borderRadius:'20px',padding:'2px 10px',fontSize:'11px',fontWeight:'600'}}>✓ Saved</span>}
+              </div>
+              <div style={{fontSize:'12px',color:'#64748B',marginBottom:'16px'}}>Flag each area before generating the work plan. Defaults to Investigate / Monitor.</div>
+
+              {(() => {
+                const ACTIONS = [
+                  { label:'Remediation Required',  activeBg:'#DC2626', activeColor:'white', inactiveBg:'#FEE2E2', inactiveColor:'#991B1B' },
+                  { label:'Investigate / Monitor', activeBg:'#D97706', activeColor:'white', inactiveBg:'#FEF3C7', inactiveColor:'#92400E' },
+                  { label:'Document Only',         activeBg:'#64748B', activeColor:'white', inactiveBg:'#F1F5F9', inactiveColor:'#475569' },
+                ]
+                const namedAreas = (fd.affectedAreas || []).map((area, i) => ({ area, i })).filter(({ area }) => area.room?.trim())
+                return namedAreas.map(({ area, i }, ni) => {
+                  const current = areaScope[i] || 'Investigate / Monitor'
+                  return (
+                    <div key={i} style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'12px',padding:'10px 0',borderBottom: ni < namedAreas.length - 1 ? '1px solid #F1F5F9' : 'none',flexWrap:'wrap'}}>
+                      <div style={{fontSize:'13px',fontWeight:'500',color:'#0F172A',minWidth:'160px'}}>
+                        {area.room}{area.detail ? ` — ${area.detail}` : ''}
+                        {area.area ? <span style={{fontSize:'11px',color:'#94A3B8',marginLeft:'6px'}}>{area.area} sq ft</span> : null}
+                      </div>
+                      <div style={{display:'flex',gap:'6px'}}>
+                        {ACTIONS.map(a => {
+                          const active = current === a.label
+                          return (
+                            <button key={a.label} onClick={() => { const s=[...areaScope]; s[i]=a.label; setAreaScope(s) }}
+                              style={{padding:'5px 12px',borderRadius:'20px',fontSize:'11px',fontWeight:'600',border:'none',cursor:'pointer',
+                                background: active ? a.activeBg : a.inactiveBg,
+                                color: active ? a.activeColor : a.inactiveColor,
+                              }}
+                            >{a.label}</button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+                })
+              })()}
+
+              <div style={{marginTop:'16px',display:'flex',gap:'8px',alignItems:'center'}}>
+                <button
+                  onClick={saveAreaScope}
+                  disabled={scopeSaving}
+                  style={{background:'#0E2A50',color:'white',border:'none',borderRadius:'8px',padding:'9px 18px',fontSize:'13px',fontWeight:'500',cursor:scopeSaving?'not-allowed':'pointer',opacity:scopeSaving?0.7:1}}
+                >
+                  {scopeSaving ? 'Saving…' : scopeSet ? '↺ Update Scope' : '✓ Save Scope'}
+                </button>
+                <span style={{fontSize:'11px',color:'#94A3B8'}}>
+                  {areaScope.filter(a => a === 'Remediation Required').length} remediation · {areaScope.filter(a => a === 'Investigate / Monitor').length} monitor · {areaScope.filter(a => a === 'Document Only').length} document only
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Work Plan */}
           <div style={{background:'white',borderRadius:'12px',border:'1px solid #E2E8F0',padding:'20px 24px',marginBottom:'16px'}}>
             <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'4px'}}>
@@ -382,7 +480,7 @@ export default function InspectionDetail() {
             <div style={{fontSize:'12px',color:'#64748B',marginBottom:'16px'}}>
               {insp.work_plan_data
                 ? `Work Plan ${insp.work_plan_data.workPlanNumber} generated · ${insp.work_plan_data.overallRemediationLevel} · ${insp.work_plan_data.totalAffectedSqft} sq ft · ${new Date(insp.work_plan_data.generatedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`
-                : 'Claude reads the full assessment, applies NYC DOH and IICRC S520 guidelines, and generates a complete NYS-compliant Work Plan with remediation procedures, containment specs, and PPE requirements.'}
+                : 'Claude reads the full assessment and generates a complete NYS-compliant Work Plan per 2 NYCRR Part 56, NYC Local Law 61, and NYC DOH Guidelines — with remediation procedures, containment specs, and PPE requirements.'}
             </div>
             {workPlanStatus === 'generating' && (
               <div style={{background:'#EFF6FF',border:'1px solid #BFDBFE',borderRadius:'8px',padding:'10px 16px',marginBottom:'12px',fontSize:'13px',color:'#1E40AF',display:'flex',alignItems:'center',gap:'8px'}}>

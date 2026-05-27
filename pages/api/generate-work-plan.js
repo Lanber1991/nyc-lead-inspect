@@ -1,9 +1,9 @@
-import chromium from '@sparticuz/chromium'
-import puppeteer from 'puppeteer-core'
-import { PDFDocument } from 'pdf-lib'
 import { createClient } from '@supabase/supabase-js'
 import fs from 'fs'
 import path from 'path'
+
+export const maxDuration = 60
+export const config = { api: { responseLimit: '10mb' } }
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -49,6 +49,17 @@ Lead paint waste (chips, dust, components) must be disposed of as regulated wast
 
 Respond ONLY with a valid JSON object. No other text, no markdown, no code fences.`
 
+function classifyArea(area) {
+  const chars = (area.characteristics || '').toLowerCase()
+  const severity = (area.severity || '').toLowerCase()
+  const material = (area.material || '').toLowerCase()
+  const highSeverity = severity.includes('moderate') || severity.includes('high')
+  const deteriorated = chars.includes('deteriorat') || chars.includes('peeling') || chars.includes('chipping') || chars.includes('active')
+  const frictionSurface = material.includes('window') || material.includes('door') || (area.room || '').toLowerCase().includes('window')
+  if (highSeverity || deteriorated || frictionSurface) return 'Full Remediation Required'
+  return 'Investigate / Monitor'
+}
+
 async function callClaudeForWorkPlan(fd, labData, insp) {
   const areas = fd.affectedAreas || []
   const airSamples = fd.airSamples || []
@@ -75,7 +86,7 @@ async function callClaudeForWorkPlan(fd, labData, insp) {
       moldOnVents: fd.moldOnVents || '—',
       servingAffectedArea: fd.hvacServingArea || '—'
     },
-    affectedAreas: areas.map(a => ({
+    affectedAreas: areas.map((a, i) => ({
       room: a.room || '—',
       detail: a.detail || '',
       material: a.material || '—',
@@ -88,7 +99,8 @@ async function callClaudeForWorkPlan(fd, labData, insp) {
       temp: `${a.temp || '—'}°F`,
       rh: `${a.rh || '—'}%`,
       samplesCollected: Array.isArray(a.sample) ? a.sample.join(', ') : (a.sample || 'none'),
-      notes: a.notes || ''
+      notes: a.notes || '',
+      recommendedAction: (fd.areaActions && fd.areaActions[i]) || classifyArea(a)
     })),
     airSamples: airSamples.map(s => ({
       label: s.label,
@@ -157,15 +169,18 @@ Respond with this JSON structure exactly:
       'anthropic-version': '2023-06-01'
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 8000,
       system: WORK_PLAN_SYSTEM,
       messages: [{ role: 'user', content: prompt }]
     })
   })
 
+  if (!res.ok) {
+    const errText = await res.text()
+    throw new Error(`Claude API ${res.status}: ${errText.slice(0, 200)}`)
+  }
   const data = await res.json()
-  if (!res.ok) throw new Error(data.error?.message || 'Claude API error')
   const text = data.content?.[0]?.text?.trim() || ''
   const jsonText = text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim()
   return JSON.parse(jsonText)
@@ -224,7 +239,7 @@ function buildCoverHTML(insp, wp) {
   <div style="margin-top:30px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:12px 16px;font-size:9pt;color:#BAD4F5;line-height:1.6">
     This Work Plan has been prepared pursuant to NYC Local Law 1 of 2004, the HUD Guidelines, and the EPA RRP Rule. The remediation contractor must review and sign this plan before commencing work. Per NYS law, the lead inspector and abatement contractor must be separate, unaffiliated entities. Post-abatement clearance testing must be conducted by an independent licensed lead inspector or risk assessor.
   </div>
-  <div style="text-align:center;font-size:8pt;color:#4A6FA8;padding:16px 0 0;margin-top:24px;border-top:1px solid rgba(255,255,255,0.1)">NYC Lead Inspections &nbsp;·&nbsp; 208 Meserole Street, Brooklyn NY 11206 &nbsp;·&nbsp; (646) 496-7039 &nbsp;·&nbsp; info@mindfulsolutionsny.com &nbsp;·&nbsp; www.mindfulsolutionsny.com</div>
+  <div style="text-align:center;font-size:8pt;color:#4A6FA8;padding:16px 0 0;margin-top:24px;border-top:1px solid rgba(255,255,255,0.1)">NYC Lead Inspections &nbsp;·&nbsp; 208 Meserole Street, Brooklyn NY 11206 &nbsp;·&nbsp; (646) 496-7039 &nbsp;·&nbsp; info@nycleadinspections.com &nbsp;·&nbsp; www.nycleadinspections.com</div>
 </div>
 </body></html>`
 }
@@ -481,7 +496,7 @@ async function renderWorkPlanPdf(coverHtml, contentHtml, workPlanNumber) {
   })
 
   const headerTpl = `<div style="width:100%;background:#0E2A50;color:white;font-family:Helvetica,Arial,sans-serif;font-size:9pt;display:flex;justify-content:space-between;align-items:center;padding:0 36px;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;height:100%"><span>NYC Lead Inspections &nbsp;·&nbsp; Lead Abatement Work Plan</span><span>${workPlanNumber}</span></div>`
-  const footerTpl = `<div style="width:100%;font-family:Helvetica,Arial,sans-serif;font-size:7.5pt;color:#64748B;padding:0 36px;box-sizing:border-box;border-top:1px solid #E2E8F0;text-align:center;display:flex;align-items:center;justify-content:center;height:100%">NYC Lead Inspections &nbsp;·&nbsp; 208 Meserole Street, Brooklyn NY 11206 &nbsp;·&nbsp; (646) 496-7039 &nbsp;·&nbsp; info@mindfulsolutionsny.com &nbsp;·&nbsp; www.mindfulsolutionsny.com</div>`
+  const footerTpl = `<div style="width:100%;font-family:Helvetica,Arial,sans-serif;font-size:7.5pt;color:#64748B;padding:0 36px;box-sizing:border-box;border-top:1px solid #E2E8F0;text-align:center;display:flex;align-items:center;justify-content:center;height:100%">NYC Lead Inspections &nbsp;·&nbsp; 208 Meserole Street, Brooklyn NY 11206 &nbsp;·&nbsp; (646) 496-7039 &nbsp;·&nbsp; info@nycleadinspections.com &nbsp;·&nbsp; www.nycleadinspections.com</div>`
 
   const contentPage = await browser.newPage()
   await contentPage.setContent(contentHtml, { waitUntil: 'networkidle0' })
