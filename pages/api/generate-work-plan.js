@@ -47,6 +47,8 @@ Clearance testing must be performed by a licensed lead inspector or risk assesso
 WASTE DISPOSAL:
 Lead paint waste (chips, dust, components) must be disposed of as regulated waste per EPA and local requirements. Double-bagged in 6-mil poly bags, labeled "CAUTION: LEAD PAINT WASTE." Transport by licensed waste hauler to approved facility.
 
+CONCISENESS RULE: All text fields in your JSON response must be 1-2 sentences maximum. No preambles, no filler, no repetition of data already in the structured fields. Write like a professional report, not a chatbot.
+
 Respond ONLY with a valid JSON object. No other text, no markdown, no code fences.`
 
 function classifyArea(area) {
@@ -66,38 +68,38 @@ async function callClaudeForWorkPlan(fd, labData, insp) {
 
   const inspectionSummary = {
     property: `${fd.propAddr || insp.property_address}, ${insp.property_city} ${insp.property_state_zip}`,
-    propertyType: fd.propType || '—',
-    yearBuilt: fd.yearBuilt || '—',
-    sqft: fd.sqft || '—',
+    propertyType: fd.propType || '',
+    yearBuilt: fd.yearBuilt || '',
+    sqft: fd.sqft || '',
     inspectionDate: insp.inspection_date,
     inspector: insp.inspector_name,
-    inspectorCert: fd.inspCert || '—',
-    client: insp.client_name || '—',
-    purpose: insp.purpose || '—',
-    overallRisk: fd.riskLevel || '—',
-    occupancy: fd.occupancyStatus || '—',
-    vulnerableOccupants: fd.vulnerableOccupants || '—',
-    moistureDuration: fd.moistureDuration || '—',
-    outdoorConditions: `${fd.weather || '—'}, ${fd.outdoorTemp || '—'}°F, ${fd.outdoorRH || '—'}% RH`,
+    inspectorCert: fd.inspCert || '',
+    client: insp.client_name || '',
+    purpose: insp.purpose || '',
+    overallRisk: fd.riskLevel || '',
+    occupancy: fd.occupancyStatus || '',
+    vulnerableOccupants: fd.vulnerableOccupants || '',
+    moistureDuration: fd.moistureDuration || '',
+    outdoorConditions: `${fd.weather || ''}, ${fd.outdoorTemp || ''}°F, ${fd.outdoorRH || ''}% RH`,
     hvac: {
-      type: fd.hvacType || '—',
-      filterCondition: fd.filterCond || '—',
-      ductCondition: fd.ductCond || '—',
-      moldOnVents: fd.moldOnVents || '—',
-      servingAffectedArea: fd.hvacServingArea || '—'
+      type: fd.hvacType || '',
+      filterCondition: fd.filterCond || '',
+      ductCondition: fd.ductCond || '',
+      moldOnVents: fd.moldOnVents || '',
+      servingAffectedArea: fd.hvacServingArea || ''
     },
     affectedAreas: areas.map((a, i) => ({
-      room: a.room || '—',
+      room: a.room || '',
       detail: a.detail || '',
-      material: a.material || '—',
-      sqft: a.area || '—',
-      severity: a.severity || '—',
-      moistureContent: `${a.mc || '—'}% (${a.classification || '—'})`,
-      moistureSource: a.source || '—',
-      substrate: a.substrate || '—',
-      thermalAnomaly: a.ir || '—',
-      temp: `${a.temp || '—'}°F`,
-      rh: `${a.rh || '—'}%`,
+      material: a.material || '',
+      sqft: a.area || '',
+      severity: a.severity || '',
+      moistureContent: `${a.mc || ''}% (${a.classification || ''})`,
+      moistureSource: a.source || '',
+      substrate: a.substrate || '',
+      thermalAnomaly: a.ir || '',
+      temp: `${a.temp || ''}°F`,
+      rh: `${a.rh || ''}%`,
       samplesCollected: Array.isArray(a.sample) ? a.sample.join(', ') : (a.sample || 'none'),
       notes: a.notes || '',
       recommendedAction: (fd.areaActions && fd.areaActions[i]) || classifyArea(a)
@@ -129,7 +131,7 @@ ${JSON.stringify(inspectionSummary, null, 2)}
 Respond with this JSON structure exactly:
 {
   "workPlanNumber": "WP-${insp.report_number}",
-  "projectSummary": "3-4 sentence overview of lead paint findings and scope of abatement work required",
+  "projectSummary": "1-2 sentence overview of lead paint findings and scope of abatement work required",
   "overallAbatementScope": "e.g. Component replacement + encapsulation — multiple rooms",
   "totalAffectedSqft": <number>,
   "estimatedDuration": "e.g. 2–3 days",
@@ -219,7 +221,7 @@ function buildCoverHTML(insp, wp) {
       <div style="font-size:9pt;color:#BAD4F5;margin-top:2px">${insp.property_city} ${insp.property_state_zip}</div>
       <div style="margin-top:16px">
         <div style="font-size:8pt;color:#93C5FD;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Client</div>
-        <div style="font-size:13pt;font-weight:500">${insp.client_name || '—'}</div>
+        <div style="font-size:13pt;font-weight:500">${insp.client_name || ''}</div>
       </div>
     </div>
     <div>
@@ -228,7 +230,7 @@ function buildCoverHTML(insp, wp) {
       <div style="margin-top:16px">
         <div style="font-size:8pt;color:#93C5FD;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Prepared By</div>
         <div style="font-size:13pt;font-weight:500">${insp.inspector_name}</div>
-        <div style="font-size:9pt;color:#BAD4F5;margin-top:2px">Lead Inspector — NYS DOL · Lic. #${fd.inspCert || '—'}</div>
+        <div style="font-size:9pt;color:#BAD4F5;margin-top:2px">Lead Inspector — NYS DOL · Lic. #${fd.inspCert || ''}</div>
       </div>
       <div style="margin-top:16px">
         <div style="font-size:8pt;color:#93C5FD;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Date Prepared</div>
@@ -301,28 +303,28 @@ function buildContentHTML(insp, wp) {
       <div class="summary-stat-label">Areas</div>
     </div>
     <div class="summary-stat">
-      <div class="summary-stat-num">${wp.totalAffectedSqft || '—'}</div>
+      <div class="summary-stat-num">${wp.totalAffectedSqft || ''}</div>
       <div class="summary-stat-label">Total Sq Ft</div>
     </div>
     <div class="summary-stat">
-      <div class="summary-stat-num" style="font-size:10pt">${(wp.overallAbatementScope || '—').split('—')[0].trim()}</div>
+      <div class="summary-stat-num" style="font-size:10pt">${(wp.overallAbatementScope || '').split('—')[0].trim()}</div>
       <div class="summary-stat-label">Abatement Scope</div>
     </div>
     <div class="summary-stat">
-      <div class="summary-stat-num">${wp.estimatedDuration || '—'}</div>
+      <div class="summary-stat-num">${wp.estimatedDuration || ''}</div>
       <div class="summary-stat-label">Est. Duration</div>
     </div>
   </div>
 
   <div class="fields-table">
     <div class="field-row"><div class="field-label">Property Address</div><div class="field-value">${fd.propAddr || insp.property_address}, ${insp.property_city} ${insp.property_state_zip}</div></div>
-    <div class="field-row"><div class="field-label">Client</div><div class="field-value">${insp.client_name || '—'}</div></div>
-    <div class="field-row"><div class="field-label">Inspector / Assessor</div><div class="field-value">${insp.inspector_name} · Lic. #${fd.inspCert || '—'}</div></div>
+    <div class="field-row"><div class="field-label">Client</div><div class="field-value">${insp.client_name || ''}</div></div>
+    <div class="field-row"><div class="field-label">Inspector / Assessor</div><div class="field-value">${insp.inspector_name} · Lic. #${fd.inspCert || ''}</div></div>
     <div class="field-row"><div class="field-label">Assessment Date</div><div class="field-value">${insp.inspection_date}</div></div>
     <div class="field-row"><div class="field-label">Assessment Report #</div><div class="field-value">${insp.report_number}</div></div>
     <div class="field-row"><div class="field-label">Work Plan Number</div><div class="field-value">${wp.workPlanNumber}</div></div>
     <div class="field-row"><div class="field-label">Regulatory Basis</div><div class="field-value">${wp.regulatoryBasis}</div></div>
-    <div class="field-row"><div class="field-label">Overall Abatement Scope</div><div class="field-value">${wp.overallAbatementScope || '—'}</div></div>
+    <div class="field-row"><div class="field-label">Overall Abatement Scope</div><div class="field-value">${wp.overallAbatementScope || ''}</div></div>
   </div>
 
   <div class="info-block"><!-- REFINE:projectSummary:start -->${wp.projectSummary}<!-- REFINE:projectSummary:end --></div>
@@ -356,7 +358,7 @@ function buildContentHTML(insp, wp) {
 <div class="page">
   <div class="sec-head">
     <div class="sec-head-title">Component-by-Component Abatement Scope</div>
-    <div class="sec-head-sub">${wp.areas?.length || 0} component(s) · ${wp.totalAffectedSqft || '—'} total sq ft</div>
+    <div class="sec-head-sub">${wp.areas?.length || 0} component(s) · ${wp.totalAffectedSqft || ''} total sq ft</div>
   </div>
 
   ${(wp.areas || []).map((a, i) => {
@@ -573,7 +575,7 @@ async function sendWorkPlanEmail(pdfBuffer, insp, wp) {
           </p>
           <div style="background:white;border:1px solid #E2E8F0;border-radius:6px;padding:12px 16px;margin-bottom:16px">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px">
-              <div><span style="color:#64748B">Client:</span> <strong>${insp.client_name || '—'}</strong></div>
+              <div><span style="color:#64748B">Client:</span> <strong>${insp.client_name || ''}</strong></div>
               <div><span style="color:#64748B">Inspector:</span> <strong>${insp.inspector_name}</strong></div>
               <div><span style="color:#64748B">Property:</span> <strong>${insp.property_address}</strong></div>
               <div><span style="color:#64748B">Level:</span> <strong>${wp.overallRemediationLevel}</strong></div>

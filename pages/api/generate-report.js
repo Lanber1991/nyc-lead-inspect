@@ -144,7 +144,7 @@ function buildReportHTML(insp, labData, summaries = {}, logoB64 = null) {
   )
   const rawAirSamples = (fd.airSamples || []).filter(s => s.label || s.location || s.type)
   const recs = fd.recommendations?.items || []
-  const risk = fd.riskLevel || '—'
+  const risk = fd.riskLevel || ''
   const photos = fd.photos || {}
 
   const pairedSamples = matchSamples(rawAirSamples, labData?.samples)
@@ -236,11 +236,11 @@ function buildReportHTML(insp, labData, summaries = {}, logoB64 = null) {
       </div>
       <div style="margin-top:16px">
         <div class="cover-field-label">Report Prepared For</div>
-        <div class="cover-field-value">${insp.client_name || '—'}</div>
+        <div class="cover-field-value">${insp.client_name || ''}</div>
       </div>
     </div>
   </div>
-  <div style="margin-top:20px;font-size:9pt;color:#4A6FA5">Report #: ${insp.report_number} · COC #: ${fd.cocNumber || '—'}</div>
+  <div style="margin-top:20px;font-size:9pt;color:#4A6FA5">Report #: ${insp.report_number} · COC #: ${fd.cocNumber || ''}</div>
 </div>
 
 <!-- EXECUTIVE SUMMARY -->
@@ -266,11 +266,11 @@ function buildReportHTML(insp, labData, summaries = {}, logoB64 = null) {
   </div>
   <div class="fields-table">
     <div class="field-row"><div class="field-label">Property</div><div class="field-value">${fd.propAddr || insp.property_address}, ${insp.property_city}</div></div>
-    <div class="field-row"><div class="field-label">Client</div><div class="field-value">${insp.client_name || '—'}</div></div>
+    <div class="field-row"><div class="field-label">Client</div><div class="field-value">${insp.client_name || ''}</div></div>
     <div class="field-row"><div class="field-label">Inspector</div><div class="field-value">${insp.inspector_name}</div></div>
     <div class="field-row"><div class="field-label">Date & Time</div><div class="field-value">${insp.inspection_date} ${fd.inspTime || ''}</div></div>
-    <div class="field-row"><div class="field-label">COC #</div><div class="field-value">${fd.cocNumber || '—'}</div></div>
-    <div class="field-row"><div class="field-label">Purpose</div><div class="field-value">${insp.purpose || '—'}</div></div>
+    <div class="field-row"><div class="field-label">COC #</div><div class="field-value">${fd.cocNumber || ''}</div></div>
+    <div class="field-row"><div class="field-label">Purpose</div><div class="field-value">${insp.purpose || ''}</div></div>
   </div>
   ${recs.length > 0 ? `
   <div style="font-size:9pt;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.5px;margin:16px 0 8px">Key Recommendations</div>
@@ -291,17 +291,17 @@ function buildReportHTML(insp, labData, summaries = {}, logoB64 = null) {
   </div>
   <div class="fields-table">
     <div class="field-row"><div class="field-label">Inspector</div><div class="field-value">${insp.inspector_name}</div></div>
-    <div class="field-row"><div class="field-label">Certification #</div><div class="field-value">${fd.inspCert || '—'}</div></div>
+    <div class="field-row"><div class="field-label">Certification #</div><div class="field-value">${fd.inspCert || ''}</div></div>
     <div class="field-row"><div class="field-label">Report #</div><div class="field-value">${insp.report_number}</div></div>
-    <div class="field-row"><div class="field-label">COC #</div><div class="field-value">${fd.cocNumber || '—'}</div></div>
+    <div class="field-row"><div class="field-label">COC #</div><div class="field-value">${fd.cocNumber || ''}</div></div>
     <div class="field-row"><div class="field-label">Date & Time</div><div class="field-value">${insp.inspection_date} ${fd.inspTime || ''}</div></div>
     <div class="field-row"><div class="field-label">Property Address</div><div class="field-value">${fd.propAddr || ''} ${fd.propUnit && fd.propUnit !== '—' ? 'Unit ' + fd.propUnit : ''}, ${insp.property_city} ${insp.property_state_zip}</div></div>
-    <div class="field-row"><div class="field-label">Property Type</div><div class="field-value">${fd.propType || '—'}</div></div>
-    <div class="field-row"><div class="field-label">Client</div><div class="field-value">${insp.client_name || '—'}</div></div>
-    <div class="field-row"><div class="field-label">Purpose</div><div class="field-value">${insp.purpose || '—'}</div></div>
-    <div class="field-row"><div class="field-label">Outdoor Temp / RH</div><div class="field-value">${fd.outdoorTemp || '—'}°F / ${fd.outdoorRH || '—'}%</div></div>
-    <div class="field-row"><div class="field-label">Weather</div><div class="field-value">${fd.weather || '—'}</div></div>
-    <div class="field-row"><div class="field-label">Occupancy</div><div class="field-value">${fd.occupancyStatus || '—'}</div></div>
+    <div class="field-row"><div class="field-label">Property Type</div><div class="field-value">${fd.propType || ''}</div></div>
+    <div class="field-row"><div class="field-label">Client</div><div class="field-value">${insp.client_name || ''}</div></div>
+    <div class="field-row"><div class="field-label">Purpose</div><div class="field-value">${insp.purpose || ''}</div></div>
+    <div class="field-row"><div class="field-label">Outdoor Temp / RH</div><div class="field-value">${fd.outdoorTemp || ''}°F / ${fd.outdoorRH || ''}%</div></div>
+    <div class="field-row"><div class="field-label">Weather</div><div class="field-value">${fd.weather || ''}</div></div>
+    <div class="field-row"><div class="field-label">Occupancy</div><div class="field-value">${fd.occupancyStatus || ''}</div></div>
   </div>
   ${sectionSummaryBlock('visual', summaries.visual)}
   </div>
@@ -316,15 +316,15 @@ function buildReportHTML(insp, labData, summaries = {}, logoB64 = null) {
   ${areas.map((a, i) => `
     <div class="area-card">
       <div class="area-title">Area ${i+1}: ${a.room || ''}${a.detail ? ' — ' + a.detail : ''}
-        <span class="badge" style="margin-left:8px;background:${a.severity?.includes('High') ? '#FEE2E2' : a.severity?.includes('Moderate') ? '#FEF3C7' : '#F3F4F6'};color:${a.severity?.includes('High') ? '#991B1B' : a.severity?.includes('Moderate') ? '#92400E' : '#374151'}">${a.severity || '—'}</span>
+        <span class="badge" style="margin-left:8px;background:${a.severity?.includes('High') ? '#FEE2E2' : a.severity?.includes('Moderate') ? '#FEF3C7' : '#F3F4F6'};color:${a.severity?.includes('High') ? '#991B1B' : a.severity?.includes('Moderate') ? '#92400E' : '#374151'}">${a.severity || ''}</span>
       </div>
       <div class="fields-table">
-        <div class="field-row"><div class="field-label">Material</div><div class="field-value">${a.material || '—'}</div></div>
-        <div class="field-row"><div class="field-label">Estimated Area</div><div class="field-value">${a.area || '—'} sq ft</div></div>
-        <div class="field-row"><div class="field-label">Moisture Source</div><div class="field-value">${a.source || '—'}</div></div>
-        <div class="field-row"><div class="field-label">Substrate</div><div class="field-value">${a.substrate || '—'}</div></div>
-        <div class="field-row"><div class="field-label">Accessibility</div><div class="field-value">${a.accessibility || '—'}</div></div>
-        <div class="field-row"><div class="field-label">Samples</div><div class="field-value">${Array.isArray(a.sample) ? a.sample.join(', ') : (a.sample || '—')}</div></div>
+        <div class="field-row"><div class="field-label">Material</div><div class="field-value">${a.material || ''}</div></div>
+        <div class="field-row"><div class="field-label">Estimated Area</div><div class="field-value">${a.area || ''} sq ft</div></div>
+        <div class="field-row"><div class="field-label">Moisture Source</div><div class="field-value">${a.source || ''}</div></div>
+        <div class="field-row"><div class="field-label">Substrate</div><div class="field-value">${a.substrate || ''}</div></div>
+        <div class="field-row"><div class="field-label">Accessibility</div><div class="field-value">${a.accessibility || ''}</div></div>
+        <div class="field-row"><div class="field-label">Samples</div><div class="field-value">${Array.isArray(a.sample) ? a.sample.join(', ') : (a.sample || '')}</div></div>
       </div>
       ${a.notes ? `<div style="font-size:10pt;color:#374151;margin-top:8px;padding:8px;background:#F8FAFC;border-radius:4px">${a.notes}</div>` : ''}
       ${renderPhotoGrid(a.moldPhotos, 'Mold Photos')}
@@ -338,7 +338,7 @@ function buildReportHTML(insp, labData, summaries = {}, logoB64 = null) {
   <div class="page-header"><span>NYC Lead Inspections · IAQ Report</span><span>${insp.report_number}</span></div>
   <div class="sec-head">
     <div class="sec-head-title">3. ${visualOnly ? 'Inspection Method' : 'Air Samples & Laboratory Results'}</div>
-    <div class="sec-head-sub">${visualOnly ? 'Visual inspection — no air sampling conducted' : `COC #${fd.cocNumber || '—'} · ${pairedSamples.length} sample(s)`}</div>
+    <div class="sec-head-sub">${visualOnly ? 'Visual inspection — no air sampling conducted' : `COC #${fd.cocNumber || ''} · ${pairedSamples.length} sample(s)`}</div>
   </div>
   ${visualOnly ? `
   <div style="border:2px solid #185FA5;border-radius:8px;padding:24px 28px;margin:16px 0;background:#EFF6FF">
@@ -366,8 +366,8 @@ function buildReportHTML(insp, labData, summaries = {}, logoB64 = null) {
         Sample #${i+1}${s.label ? ' [' + s.label + ']' : ''}${s.outdoor_control || lab?.outdoor_control ? ' — Outdoor Control' : (s.type ? ' — ' + s.type : '')}
       </div>
       <div class="fields-table">
-        <div class="field-row"><div class="field-label">Location</div><div class="field-value">${s.location || lab?.location || '—'}</div></div>
-        <div class="field-row"><div class="field-label">Duration / Volume</div><div class="field-value">${s.duration || '—'} min / ${s.volume || '—'} L</div></div>
+        <div class="field-row"><div class="field-label">Location</div><div class="field-value">${s.location || lab?.location || ''}</div></div>
+        <div class="field-row"><div class="field-label">Duration / Volume</div><div class="field-value">${s.duration || ''} min / ${s.volume || ''} L</div></div>
         ${lab ? `<div class="field-row"><div class="field-label">Lab Sample ID</div><div class="field-value">${lab.sample_id}</div></div>` : ''}
       </div>
       ${lab ? `
@@ -420,13 +420,13 @@ ${hvacPresent ? `
     <div class="sec-head-sub">${fd.hvacType || 'System type not specified'} · Filter: ${fd.filterCond || 'Not assessed'}</div>
   </div>
   <div class="fields-table">
-    <div class="field-row"><div class="field-label">HVAC Type</div><div class="field-value">${fd.hvacType || '—'}</div></div>
-    <div class="field-row"><div class="field-label">Filter Condition</div><div class="field-value">${fd.filterCond || '—'}</div></div>
-    <div class="field-row"><div class="field-label">Filter Type / MERV</div><div class="field-value">${fd.filterType || '—'}</div></div>
-    <div class="field-row"><div class="field-label">Duct Condition</div><div class="field-value">${fd.ductCond || '—'}</div></div>
-    <div class="field-row"><div class="field-label">Serving Affected Area</div><div class="field-value">${fd.hvacServingArea || '—'}</div></div>
-    <div class="field-row"><div class="field-label">Mold on Vents</div><div class="field-value">${fd.moldOnVents || '—'}</div></div>
-    <div class="field-row"><div class="field-label">HVAC During Sampling</div><div class="field-value">${fd.hvacDuringSampling || '—'}</div></div>
+    <div class="field-row"><div class="field-label">HVAC Type</div><div class="field-value">${fd.hvacType || ''}</div></div>
+    <div class="field-row"><div class="field-label">Filter Condition</div><div class="field-value">${fd.filterCond || ''}</div></div>
+    <div class="field-row"><div class="field-label">Filter Type / MERV</div><div class="field-value">${fd.filterType || ''}</div></div>
+    <div class="field-row"><div class="field-label">Duct Condition</div><div class="field-value">${fd.ductCond || ''}</div></div>
+    <div class="field-row"><div class="field-label">Serving Affected Area</div><div class="field-value">${fd.hvacServingArea || ''}</div></div>
+    <div class="field-row"><div class="field-label">Mold on Vents</div><div class="field-value">${fd.moldOnVents || ''}</div></div>
+    <div class="field-row"><div class="field-label">HVAC During Sampling</div><div class="field-value">${fd.hvacDuringSampling || ''}</div></div>
   </div>
   ${fd.hvacNotes ? `<div class="ai-block"><div class="ai-label">HVAC Notes</div><div class="ai-text">${fd.hvacNotes}</div></div>` : ''}
   ${renderPhotoGrid(photos.hvac, 'HVAC Photos')}
@@ -481,7 +481,7 @@ ${labData?.narrative ? `
   <div class="page-header"><span>NYC Lead Inspections · IAQ Report</span><span>${insp.report_number}</span></div>
   <div class="sec-head">
     <div class="sec-head-title">6. Laboratory Interpretation</div>
-    <div class="sec-head-sub">COC #${fd.cocNumber || labData.cocNumber || '—'} · Full laboratory report attached as appendix</div>
+    <div class="sec-head-sub">COC #${fd.cocNumber || labData.cocNumber || ''} · Full laboratory report attached as appendix</div>
   </div>
   <div class="ai-block">
     <div class="ai-label">Analysis & Interpretation</div>
@@ -552,7 +552,7 @@ You may use industry-standard technical guidance to fill any technical gaps not 
 
 DUST WIPE CLEARANCE THRESHOLDS (EPA/NYC): Floors — 10 μg/ft²; Interior window sills — 100 μg/ft²; Window troughs — 100 μg/ft². Results above these thresholds constitute a lead dust hazard and require remediation.
 
-CRITICAL FORMATTING RULE: Your entire response must be a single paragraph of exactly 3 to 5 sentences. Do not use headers, subheadings, bullet points, numbered lists, or multiple paragraphs under any circumstances. Synthesize all findings into one concise paragraph only. Stop after 5 sentences.`
+CRITICAL FORMATTING RULE: Your entire response must be a single paragraph of exactly 2 to 3 sentences. Do not use headers, subheadings, bullet points, numbered lists, or multiple paragraphs under any circumstances. Synthesize all findings into one concise paragraph only. Stop after 3 sentences.`
 
   // Helper: append photos from an array to a content block list
   function addPhotos(blocks, photoArray, contextLabel) {
@@ -569,14 +569,14 @@ CRITICAL FORMATTING RULE: Your entire response must be a single paragraph of exa
   const visualBlocks = [{
     type: 'text',
     text: `Write the Visual Inspection summary.
-Property: ${fd.propAddr || insp.property_address}, ${insp.property_city} | Type: ${fd.propType || '—'} | Year: ${fd.yearBuilt || '—'} | Sqft: ${fd.sqft || '—'}
-Occupancy: ${fd.occupancyStatus || '—'} | Vulnerable occupants: ${fd.vulnerableOccupants || '—'}
-Prior remediation: ${fd.priorRemediation || '—'} | Plumbing issues: ${fd.plumbingHistory || '—'}
-Moisture present for: ${fd.moistureDuration || '—'}
-Odors: ${fd.visualInspection?.odors || '—'}
-Health complaints: ${Array.isArray(fd.visualInspection?.healthComplaints) ? fd.visualInspection.healthComplaints.join(', ') : (fd.visualInspection?.healthComplaints || '—')}
-Inspector observations: ${fd.generalObs || '—'}
-Outdoor conditions: ${fd.weather || '—'}, ${fd.outdoorTemp || '—'}°F, ${fd.outdoorRH || '—'}% RH`
+Property: ${fd.propAddr || insp.property_address}, ${insp.property_city} | Type: ${fd.propType || ''} | Year: ${fd.yearBuilt || ''} | Sqft: ${fd.sqft || ''}
+Occupancy: ${fd.occupancyStatus || ''} | Vulnerable occupants: ${fd.vulnerableOccupants || ''}
+Prior remediation: ${fd.priorRemediation || ''} | Plumbing issues: ${fd.plumbingHistory || ''}
+Moisture present for: ${fd.moistureDuration || ''}
+Odors: ${fd.visualInspection?.odors || ''}
+Health complaints: ${Array.isArray(fd.visualInspection?.healthComplaints) ? fd.visualInspection.healthComplaints.join(', ') : (fd.visualInspection?.healthComplaints || '')}
+Inspector observations: ${fd.generalObs || ''}
+Outdoor conditions: ${fd.weather || ''}, ${fd.outdoorTemp || ''}°F, ${fd.outdoorRH || ''}% RH`
   }]
   const extImg = toImageBlock(photos.exterior)
   if (extImg) { visualBlocks.push({ type: 'text', text: 'Exterior photo of the property:' }); visualBlocks.push(extImg) }
@@ -586,16 +586,16 @@ Outdoor conditions: ${fd.weather || '—'}, ${fd.outdoorTemp || '—'}°F, ${fd.
   const areasSummaryText = areas.length
     ? areas.map((a, i) =>
         `Area ${i+1}: ${a.room || ''}${a.detail ? ' — ' + a.detail : ''}
-  Severity: ${a.severity || '—'} | Area: ${a.area || '—'} sq ft | Material: ${a.material || '—'} | Source: ${a.source || '—'}
-  Substrate: ${a.substrate || '—'}
-  Notes: ${a.notes || '—'}`
+  Severity: ${a.severity || ''} | Area: ${a.area || ''} sq ft | Material: ${a.material || ''} | Source: ${a.source || ''}
+  Substrate: ${a.substrate || ''}
+  Notes: ${a.notes || ''}`
       ).join('\n\n')
     : 'No affected areas documented.'
 
   const areasBlocks = [{
     type: 'text',
     text: `Write the Affected Areas summary covering mold findings, moisture readings, and thermal/Flir observations. Moisture meter readings and temperature/RH/dew point values are NOT entered manually — you must read them directly from the photos provided. For each Flir or moisture meter image: read the exact number displayed on the meter or shown in the image, state what it is (moisture content %, temperature, RH, dew point), and explain what it indicates about the moisture condition. Interpret Flir thermal color gradients — blues/purples indicate evaporative cooling or moisture, reds/yellows indicate heat or moisture accumulation.
-Moisture has been present for: ${fd.moistureDuration || '—'}
+Moisture has been present for: ${fd.moistureDuration || ''}
 ${areasSummaryText}`
   }]
   for (const a of areas) {
@@ -607,7 +607,7 @@ ${areasSummaryText}`
   const paired = matchSamples(airSamples, labData?.samples)
   const samplesText = paired.length
     ? paired.map(({ form: s, lab }, i) =>
-        `Sample ${i+1} [${s.label || ''}]: ${s.type || '—'} at ${s.location || '—'} | ${s.duration || '—'} min / ${s.volume || '—'} L
+        `Sample ${i+1} [${s.label || ''}]: ${s.type || ''} at ${s.location || ''} | ${s.duration || ''} min / ${s.volume || ''} L
   ${lab ? `Results: ${lab.raw_summary || lab.results?.map(r => `${r.species} ${r.count} ${r.unit || ''}`).join(', ') || 'No organisms above limits'}` : 'Pending'}`
       ).join('\n')
     : 'No air samples collected.'
@@ -623,10 +623,10 @@ Lab interpretation: ${labData?.narrative || 'Not yet available'}`
   const hvacBlocks = [{
     type: 'text',
     text: `Write the HVAC Inspection summary.
-System type: ${fd.hvacType || '—'} | Filter condition: ${fd.filterCond || '—'} | Filter type: ${fd.filterType || '—'}
-Duct condition: ${fd.ductCond || '—'} | Serving affected area: ${fd.hvacServingArea || '—'}
-Mold on vents: ${fd.moldOnVents || '—'} | HVAC running during sampling: ${fd.hvacDuringSampling || '—'}
-Notes: ${fd.hvacNotes || '—'}`
+System type: ${fd.hvacType || ''} | Filter condition: ${fd.filterCond || ''} | Filter type: ${fd.filterType || ''}
+Duct condition: ${fd.ductCond || ''} | Serving affected area: ${fd.hvacServingArea || ''}
+Mold on vents: ${fd.moldOnVents || ''} | HVAC running during sampling: ${fd.hvacDuringSampling || ''}
+Notes: ${fd.hvacNotes || ''}`
   }]
   const hasHvacPhotos = photos.hvac?.some(p => p.b64)
   addPhotos(hvacBlocks, photos.hvac, 'HVAC photo')
@@ -640,9 +640,9 @@ Notes: ${fd.hvacNotes || '—'}`
   const recBlocks = [{
     type: 'text',
     text: `Write the Recommendations & Conclusions summary for the client explaining what needs to be done and why.
-Overall risk: ${fd.riskLevel || '—'}
+Overall risk: ${fd.riskLevel || ''}
 ${recsText}
-Inspector conclusions: ${fd.conclusions || '—'}`
+Inspector conclusions: ${fd.conclusions || ''}`
   }]
 
   const [visual, areas_s, samples, hvac, recommendations] = await Promise.all([
@@ -659,7 +659,7 @@ Inspector conclusions: ${fd.conclusions || '—'}`
     text: `You are writing the Integrated Assessment closing paragraph for a professional Lead Paint Inspection report. This paragraph appears at the end of the report, after the reader has reviewed all the findings. Synthesize the following section summaries into one authoritative, cohesive paragraph (5–7 sentences) that answers the question: "What does all of this mean together?" Connect the visual findings to the moisture readings, the air quality data to the affected areas, and the HVAC condition to the overall risk. Conclude with the professional recommendation. Plain prose only — no markdown, no bullet points, no headers.
 
 Property: ${fd.propAddr || insp.property_address}, ${insp.property_city} | Inspector: ${insp.inspector_name} | Date: ${insp.inspection_date}
-Overall risk: ${fd.riskLevel || '—'} | Affected areas: ${areas.length} | Air samples: ${airSamples.length}
+Overall risk: ${fd.riskLevel || ''} | Affected areas: ${areas.length} | Air samples: ${airSamples.length}
 
 Visual Inspection: ${visual || 'Not available'}
 
@@ -731,12 +731,12 @@ async function sendReportEmail(pdfBuffer, insp) {
           ${inspectorNote}
           <div style="background:white;border:1px solid #E2E8F0;border-radius:6px;padding:12px 16px;margin-bottom:16px">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px">
-              <div><span style="color:#64748B">Client:</span> <strong>${insp.client_name || '—'}</strong></div>
+              <div><span style="color:#64748B">Client:</span> <strong>${insp.client_name || ''}</strong></div>
               <div><span style="color:#64748B">Inspector:</span> <strong>${insp.inspector_name}</strong></div>
               <div><span style="color:#64748B">Property:</span> <strong>${insp.property_address}</strong></div>
               <div><span style="color:#64748B">Date:</span> <strong>${insp.inspection_date}</strong></div>
-              <div><span style="color:#64748B">COC #:</span> <strong>${fd.cocNumber || '—'}</strong></div>
-              <div><span style="color:#64748B">Risk Level:</span> <strong>${fd.riskLevel || '—'}</strong></div>
+              <div><span style="color:#64748B">COC #:</span> <strong>${fd.cocNumber || ''}</strong></div>
+              <div><span style="color:#64748B">Risk Level:</span> <strong>${fd.riskLevel || ''}</strong></div>
             </div>
           </div>
           <p style="font-size:12px;color:#94A3B8;margin:0">
