@@ -18,10 +18,7 @@ export default function Dashboard() {
   const [archiveOpen, setArchiveOpen] = useState({})
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) { router.push('/login'); return }
-      fetchInspections()
-    })
+    fetchInspections()
   }, [])
 
   async function fetchInspections() {
@@ -166,12 +163,6 @@ export default function Dashboard() {
             <a href="/form.html" style={{ background: '#185FA5', color: 'white', padding: '8px 16px', borderRadius: '8px', fontSize: '13px', fontWeight: '500', textDecoration: 'none' }}>
               + New Inspection
             </a>
-            <button
-              onClick={async () => { await supabase.auth.signOut(); router.push('/login') }}
-              style={{ background: 'transparent', color: '#93C5FD', border: '1px solid #1E3A5F', borderRadius: '8px', padding: '8px 14px', fontSize: '13px', cursor: 'pointer' }}
-            >
-              Sign out
-            </button>
           </div>
         </div>
 
