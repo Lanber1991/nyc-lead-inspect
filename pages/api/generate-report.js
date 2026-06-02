@@ -234,10 +234,6 @@ function buildReportHTML(insp, labData, summaries = {}, logoB64 = null) {
         <div class="cover-field-value">${insp.inspector_name}</div>
         <div class="cover-field-sub">Mold Assessor — NYS DOL · NYC Lead Inspections</div>
       </div>
-      <div style="margin-top:16px">
-        <div class="cover-field-label">Report Prepared For</div>
-        <div class="cover-field-value">${insp.client_name || ''}</div>
-      </div>
     </div>
   </div>
   <div style="margin-top:20px;font-size:9pt;color:#4A6FA5">Report #: ${insp.report_number} · COC #: ${fd.cocNumber || ''}</div>
