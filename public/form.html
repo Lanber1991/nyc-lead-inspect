@@ -170,10 +170,7 @@
         <div class="field-group"><label>Total Sq Footage</label><input type="number" id="sqft" placeholder="sq ft"></div>
         <div class="field-group"><label>Number of Floors</label><input type="number" id="floors" min="1" placeholder="1"></div>
       </div>
-      <div class="field-group"><label>Client / Owner Name</label><input type="text" id="clientName"></div>
       <div class="field-row">
-        <div class="field-group"><label>Client Phone</label><input type="tel" id="clientPhone"></div>
-        <div class="field-group"><label>Client Email</label><input type="email" id="clientEmail"></div>
       </div>
       <div class="field-row">
         <div class="field-group"><label>Occupancy Status</label>
@@ -1374,7 +1371,7 @@ async function generateReport(narratives) {
     const addr = `${val('propAddr')}${val('propUnit')!=='—'?', Unit '+val('propUnit'):''}, ${val('propCity')} ${val('propStateZip')}`;
     doc.text(addr, margin, y); y+=14;
     doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(80,80,80);
-    doc.text(`Client: ${val('clientName')} · Purpose: ${getRadio('purpose')} · Date: ${val('inspDate')} ${val('inspTime')}`, margin, y); y+=20;
+    doc.text(`Purpose: ${getRadio('purpose')} · Date: ${val('inspDate')} ${val('inspTime')}`, margin, y); y+=20;
 
     divider();
 
@@ -1646,7 +1643,6 @@ async function generateReport(narratives) {
   divider();
   twoFld('Property Address',`${val('propAddr')}${val('propUnit') && val('propUnit')!=='—' ? ', Unit '+val('propUnit') : ''}, ${val('propCity')} ${val('propStateZip')}`,'Property Type',val('propType'));
   twoFld('Year Built',val('yearBuilt'),'Sq Footage',val('sqft'));
-  twoFld('Client',val('clientName'),'Client Phone',val('clientPhone'));
   fld('Purpose of Inspection',getRadio('purpose'));
   twoFld('Outdoor Temp (°F)',val('outdoorTemp'),'Outdoor RH (%)',val('outdoorRH'));
   twoFld('Weather',getRadio('weather'),'Building Ventilation',val('buildingVentilation'));
@@ -2480,7 +2476,6 @@ function showReviewModal(onConfirm) {
     { label:'Inspector Name', val: val('inspName'), required:true, section:'Site Info' },
     { label:'Property Address', val: val('propAddr'), required:true, section:'Site Info' },
     { label:'City', val: val('propCity'), required:true, section:'Site Info' },
-    { label:'Client Name', val: val('clientName'), required:true, section:'Site Info' },
     { label:'Purpose of Inspection', val: getRadio('purpose'), required:true, section:'Site Info' },
     { label:'COC Number', val: val('cocNumber'), required: false, section:'Review' },
     // Recommended
@@ -2585,7 +2580,6 @@ async function doSubmit(dashUrl) {
     property_address: val('propAddr') + (val('propUnit') !== '\u2014' ? ', Unit ' + val('propUnit') : ''),
     property_city: val('propCity'),
     property_state_zip: val('propStateZip'),
-    client_name: val('clientName'),
     inspection_date: val('inspDate'),
     purpose: getRadio('purpose'),
     inspection_type: inspectionType,

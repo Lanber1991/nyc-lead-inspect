@@ -266,7 +266,6 @@ function buildReportHTML(insp, labData, summaries = {}, logoB64 = null) {
   </div>
   <div class="fields-table">
     <div class="field-row"><div class="field-label">Property</div><div class="field-value">${fd.propAddr || insp.property_address}, ${insp.property_city}</div></div>
-    <div class="field-row"><div class="field-label">Client</div><div class="field-value">${insp.client_name || ''}</div></div>
     <div class="field-row"><div class="field-label">Inspector</div><div class="field-value">${insp.inspector_name}</div></div>
     <div class="field-row"><div class="field-label">Date & Time</div><div class="field-value">${insp.inspection_date} ${fd.inspTime || ''}</div></div>
     <div class="field-row"><div class="field-label">COC #</div><div class="field-value">${fd.cocNumber || ''}</div></div>
@@ -297,7 +296,6 @@ function buildReportHTML(insp, labData, summaries = {}, logoB64 = null) {
     <div class="field-row"><div class="field-label">Date & Time</div><div class="field-value">${insp.inspection_date} ${fd.inspTime || ''}</div></div>
     <div class="field-row"><div class="field-label">Property Address</div><div class="field-value">${fd.propAddr || ''} ${fd.propUnit && fd.propUnit !== '—' ? 'Unit ' + fd.propUnit : ''}, ${insp.property_city} ${insp.property_state_zip}</div></div>
     <div class="field-row"><div class="field-label">Property Type</div><div class="field-value">${fd.propType || ''}</div></div>
-    <div class="field-row"><div class="field-label">Client</div><div class="field-value">${insp.client_name || ''}</div></div>
     <div class="field-row"><div class="field-label">Purpose</div><div class="field-value">${insp.purpose || ''}</div></div>
     <div class="field-row"><div class="field-label">Outdoor Temp / RH</div><div class="field-value">${fd.outdoorTemp || ''}°F / ${fd.outdoorRH || ''}%</div></div>
     <div class="field-row"><div class="field-label">Weather</div><div class="field-value">${fd.weather || ''}</div></div>
@@ -731,7 +729,6 @@ async function sendReportEmail(pdfBuffer, insp) {
           ${inspectorNote}
           <div style="background:white;border:1px solid #E2E8F0;border-radius:6px;padding:12px 16px;margin-bottom:16px">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px">
-              <div><span style="color:#64748B">Client:</span> <strong>${insp.client_name || ''}</strong></div>
               <div><span style="color:#64748B">Inspector:</span> <strong>${insp.inspector_name}</strong></div>
               <div><span style="color:#64748B">Property:</span> <strong>${insp.property_address}</strong></div>
               <div><span style="color:#64748B">Date:</span> <strong>${insp.inspection_date}</strong></div>

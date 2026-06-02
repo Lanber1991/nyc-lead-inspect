@@ -219,10 +219,6 @@ function buildCoverHTML(insp, wp) {
       <div style="font-size:8pt;color:#93C5FD;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Property</div>
       <div style="font-size:13pt;font-weight:500">${fd.propAddr || insp.property_address}</div>
       <div style="font-size:9pt;color:#BAD4F5;margin-top:2px">${insp.property_city} ${insp.property_state_zip}</div>
-      <div style="margin-top:16px">
-        <div style="font-size:8pt;color:#93C5FD;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Client</div>
-        <div style="font-size:13pt;font-weight:500">${insp.client_name || ''}</div>
-      </div>
     </div>
     <div>
       <div style="font-size:8pt;color:#93C5FD;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Work Plan Number</div>
@@ -318,7 +314,6 @@ function buildContentHTML(insp, wp) {
 
   <div class="fields-table">
     <div class="field-row"><div class="field-label">Property Address</div><div class="field-value">${fd.propAddr || insp.property_address}, ${insp.property_city} ${insp.property_state_zip}</div></div>
-    <div class="field-row"><div class="field-label">Client</div><div class="field-value">${insp.client_name || ''}</div></div>
     <div class="field-row"><div class="field-label">Inspector / Assessor</div><div class="field-value">${insp.inspector_name} · Lic. #${fd.inspCert || ''}</div></div>
     <div class="field-row"><div class="field-label">Assessment Date</div><div class="field-value">${insp.inspection_date}</div></div>
     <div class="field-row"><div class="field-label">Assessment Report #</div><div class="field-value">${insp.report_number}</div></div>
@@ -575,7 +570,6 @@ async function sendWorkPlanEmail(pdfBuffer, insp, wp) {
           </p>
           <div style="background:white;border:1px solid #E2E8F0;border-radius:6px;padding:12px 16px;margin-bottom:16px">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px">
-              <div><span style="color:#64748B">Client:</span> <strong>${insp.client_name || ''}</strong></div>
               <div><span style="color:#64748B">Inspector:</span> <strong>${insp.inspector_name}</strong></div>
               <div><span style="color:#64748B">Property:</span> <strong>${insp.property_address}</strong></div>
               <div><span style="color:#64748B">Level:</span> <strong>${wp.overallRemediationLevel}</strong></div>

@@ -78,7 +78,7 @@ export default function Dashboard() {
   const searchTerm = search.trim().toLowerCase()
   const matchesSearch = (i) => !searchTerm || [
     i.report_number, i.property_address, i.property_city,
-    i.client_name, i.inspector_name,
+    i.inspector_name,
   ].some(v => v?.toLowerCase().includes(searchTerm))
 
   const isSearching    = !!searchTerm
@@ -118,7 +118,6 @@ export default function Dashboard() {
           <div>{insp.property_address}</div>
           <div style={{ fontSize: '11px', color: '#94A3B8' }}>{insp.property_city}</div>
         </td>
-        <td style={{ ...tdBase, color: '#334155' }}>{insp.client_name || '—'}</td>
         <td style={{ ...tdBase, color: '#334155' }}>{insp.inspector_name}</td>
         <td style={{ ...tdBase, color: '#64748B' }}>{formatDate(insp.inspection_date)}</td>
         <td style={{ ...tdBase }}>
@@ -150,7 +149,7 @@ export default function Dashboard() {
     )
   }
 
-  const fullHeaders = ['Report #', 'Property', 'Client', 'Inspector', 'Date', 'Next Step', '']
+  const fullHeaders = ['Report #', 'Property', 'Inspector', 'Date', 'Next Step', '']
 
   return (
     <>
@@ -289,7 +288,7 @@ export default function Dashboard() {
                           <div style={{ borderTop: '1px solid #F1F5F9' }}>
                             <InspTable
                               rows={items}
-                              headers={['Report #', 'Property', 'Client', 'Inspector', 'Date', 'Next Step', '']}
+                              headers={['Report #', 'Property', 'Inspector', 'Date', 'Next Step', '']}
                               showArchiveBadge={false}
                             />
                           </div>
